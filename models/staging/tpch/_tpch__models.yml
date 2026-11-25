@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_tpch__regions
+    columns:
+      - name: region_id
+        data_tests: [unique, not_null]
+  - name: stg_tpch__nations
+    columns:
+      - name: nation_id
+        data_tests: [unique, not_null]
+      - name: region_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_tpch__regions')
+                field: region_id
+  - name: stg_tpch__suppliers
+    columns:
+      - name: supplier_id
+        data_tests: [unique, not_null]
+  - name: stg_tpch__customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: market_segment
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['AUTOMOBILE', 'BUILDING', 'FURNITURE', 'HOUSEHOLD', 'MACHINERY']
+  - name: stg_tpch__parts
+    columns:
+      - name: part_id
+        data_tests: [unique, not_null]
+  - name: stg_tpch__part_suppliers
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [part_id, supplier_id]
+  - name: stg_tpch__orders
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['F', 'O', 'P']
+  - name: stg_tpch__order_items
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [order_id, line_number]
